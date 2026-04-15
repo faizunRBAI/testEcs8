@@ -35,6 +35,10 @@ resource "aws_ecr_repository" "app" {
   name                 = lower(replace(var.project_name, "_", "-"))
   image_tag_mutability = "MUTABLE"
   force_delete         = true
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # ── ECS Cluster ────────────────────────────────────────────────────────────────
@@ -219,7 +223,6 @@ resource "aws_ecs_service" "app" {
   depends_on = [aws_lb_listener.http]
 }
 
-# ── Outputs ────────────────────────────────────────────────────────────────────
 output "alb_dns_name" {
   value = aws_lb.main.dns_name
 }
