@@ -32,7 +32,7 @@ variable "health_check_path" {
 
 # ── ECR ────────────────────────────────────────────────────────────────────────
 resource "aws_ecr_repository" "app" {
-  name                 = var.project_name
+  name                 = lower(replace(var.project_name, "_", "-"))
   image_tag_mutability = "MUTABLE"
   force_delete         = true
 }
@@ -198,34 +198,4 @@ resource "aws_ecs_task_definition" "app" {
 
 # ── ECS Service ────────────────────────────────────────────────────────────────
 resource "aws_ecs_service" "app" {
-  name            = "${var.project_name}-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-
-  health_check_grace_period_seconds = 180
-
-  network_configuration {
-    subnets          = data.aws_subnets.default.ids
-    security_groups  = [aws_security_group.ecs_tasks.id]
-    assign_public_ip = true
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.app.arn
-    container_name   = var.project_name
-    container_port   = var.app_port
-  }
-
-  depends_on = [aws_lb_listener.http, aws_iam_role_policy_attachment.ecs_task_execution]
-}
-
-# ── Outputs ────────────────────────────────────────────────────────────────────
-output "alb_dns_name" {
-  value = aws_lb.main.dns_name
-}
-
-output "alb_url" {
-  value = "http://${aws_lb.main.dns_name}"
-}
+... (31 more lines truncated)
