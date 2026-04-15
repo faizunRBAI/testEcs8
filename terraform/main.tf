@@ -198,6 +198,10 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   ])
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # ── ECS Service ────────────────────────────────────────────────────────────────
@@ -223,6 +227,7 @@ resource "aws_ecs_service" "app" {
   depends_on = [aws_lb_listener.http]
 }
 
+# ── Outputs ────────────────────────────────────────────────────────────────────
 output "alb_dns_name" {
   value = aws_lb.main.dns_name
 }
